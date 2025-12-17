@@ -1,12 +1,18 @@
-const store = new Map<string, number>();
+type CreditStore = Record<string, number>;
 
-export function grantCredits(userId: string, credits: number) {
-  const current = store.get(userId) ?? 0;
-  const totalCredits = current + credits;
-  store.set(userId, totalCredits);
-  return { totalCredits };
+const store: CreditStore = {};
+
+export function getCredits(userId: string): number {
+  return store[userId] ?? 0;
 }
 
-export function getCredits(userId: string) {
-  return store.get(userId) ?? 0;
+export function setCredits(userId: string, credits: number): void {
+  store[userId] = credits;
+}
+
+export function addCredits(userId: string, creditsToAdd: number): number {
+  const current = getCredits(userId);
+  const updated = current + creditsToAdd;
+  store[userId] = updated;
+  return updated;
 }

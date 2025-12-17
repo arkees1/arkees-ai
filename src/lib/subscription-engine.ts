@@ -1,24 +1,16 @@
-import { PLANS, PlanKey } from "./plans";
 import { getCredits, setCredits } from "./credit-store";
+import { PLANS } from "./plans";
 
-export type Subscription = {
-  plan: PlanKey;
-  renewAt: number;
-};
+export type PlanKey = keyof typeof PLANS;
 
-const userSubscription = new Map<string, Subscription>();
-
-export function getUserPlan(userId: string): PlanKey {
-  return userSubscription.get(userId)?.plan || "FREE";
-}
-
-export function activatePlan(userId: string, plan: PlanKey) {
-  const credits = PLANS[plan].monthlyCredits;
-
-  userSubscription.set(userId, {
-    plan,
-    renewAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
-  });
+export function applySubscription(
+  userId: string,
+  plan: PlanKey
+): number {
+  const planConfig = PLANS[plan];
+  const credits = planConfig.monthlyCredits;
 
   setCredits(userId, credits);
+
+  return credits;
 }

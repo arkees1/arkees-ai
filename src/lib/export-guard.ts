@@ -1,17 +1,17 @@
 import { IntentType } from "./intent-engine";
 
+type Plan = "FREE" | "BASIC" | "STANDARD" | "PRO" | "PREMIUM";
+
 export function canExport(
   intent: IntentType,
-  exportType: "pdf" | "csv"
+  userPlan: Plan
 ): boolean {
-  // Chat cannot be exported directly
-  if (intent === "chat") return false;
+  if (userPlan === "FREE") return false;
 
-  // Report → PDF allowed
-  if (intent === "report" && exportType === "pdf") return true;
+  if (userPlan === "BASIC") {
+    return !["PDF", "CSV", "EXCEL"].includes(intent);
+  }
 
-  // CSV only from csv intent
-  if (intent === "csv" && exportType === "csv") return true;
-
-  return false;
+  // STANDARD / PRO / PREMIUM
+  return true;
 }

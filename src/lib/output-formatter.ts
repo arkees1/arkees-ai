@@ -1,20 +1,12 @@
-import { IntentType } from "./intent-engine";
-
 export function formatOutput(
-  intent: IntentType,
+  type: "text" | "json",
   content: string
 ): string {
-  if (intent === "report") {
-    return `REPORT\n\n${content}`;
+  if (!content) return "";
+
+  if (type === "json") {
+    return JSON.stringify({ result: content }, null, 2);
   }
 
-  if (intent === "pdf") {
-    return `PDF EXPORT\n\n${content}`;
-  }
-
-  if (intent === "csv") {
-    return `DATA\n${content}`;
-  }
-
-  return content; // chat
+  return content;
 }

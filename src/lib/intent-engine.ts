@@ -1,34 +1,19 @@
-import fs from "fs";
-import path from "path";
+export type IntentType =
+  | "TEXT"
+  | "PDF"
+  | "CSV"
+  | "EXCEL"
+  | "IMAGE"
+  | "AUDIO";
 
-type CreditRecord = {
-  userId: string;
-  credits: number;
-};
+export function detectIntent(prompt: string): IntentType {
+  const p = prompt.toLowerCase();
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const CREDIT_FILE = path.join(DATA_DIR, "credits.json");
+  if (p.includes("pdf")) return "PDF";
+  if (p.includes("csv")) return "CSV";
+  if (p.includes("excel")) return "EXCEL";
+  if (p.includes("image")) return "IMAGE";
+  if (p.includes("audio")) return "AUDIO";
 
-function ensureStore() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR);
-  }
-  if (!fs.existsSync(CREDIT_FILE)) {
-    fs.writeFileSync(CREDIT_FILE, JSON.stringify({}), "utf-8");
-  }
-}
-
-export function getUserCredits(userId: string): number {
-  ensureStore();
-  const raw = fs.readFileSync(CREDIT_FILE, "utf-8");
-  const data = JSON.parse(raw || "{}");
-  return data[userId] ?? 0;
-}
-
-export function setUserCredits(userId: string, credits: number) {
-  ensureStore();
-  const raw = fs.readFileSync(CREDIT_FILE, "utf-8");
-  const data = JSON.parse(raw || "{}");
-  data[userId] = credits;
-  fs.writeFileSync(CREDIT_FILE, JSON.stringify(data, null, 2), "utf-8");
+  return "TEXT";
 }
