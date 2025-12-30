@@ -12,7 +12,12 @@ export async function runContentOrchestrator(params: {
 
   switch (type) {
     case "dashboard":
-      return generateDashboardData(prompt);
+      return generateDashboardData([
+        {
+          role: "user",
+          content: prompt,
+        },
+      ]);
 
     default:
       throw new Error("Unsupported content type");
