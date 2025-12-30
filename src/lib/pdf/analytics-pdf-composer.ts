@@ -1,5 +1,4 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { renderLineChartPNG } from "@/lib/charts/line-chart";
 
 export async function generateAnalyticsPDF(title: string) {
   const pdfDoc = await PDFDocument.create();
