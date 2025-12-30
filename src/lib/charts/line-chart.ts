@@ -1,4 +1,5 @@
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
+import type { ChartConfiguration } from "chart.js";
 
 export type Point = {
   label: string;
@@ -18,7 +19,7 @@ export async function renderLineChartPNG(
   title: string,
   data: Point[]
 ): Promise<Buffer> {
-  const configuration = {
+  const configuration: ChartConfiguration<"line", number[], string> = {
     type: "line",
     data: {
       labels: data.map((d) => d.label),
@@ -47,7 +48,6 @@ export async function renderLineChartPNG(
     },
   };
 
-  // ✅ IMPORTANT FIX
   const buffer = await chartJSNodeCanvas.renderToBuffer(configuration);
   return buffer;
 }
