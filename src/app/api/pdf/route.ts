@@ -1,25 +1,15 @@
 import { NextResponse } from "next/server";
 import { PDFDocument, StandardFonts } from "pdf-lib";
-import { deductCredits, hasCredits } from "@/lib/credit-store";
+import { hasCredits, deductCredits } from "@/lib/credits-engine";
 
 export const runtime = "nodejs";
 
-const CREDIT_COST = 1;
+const CREDIT_COST = 2;
 
 export async function POST(req: Request) {
   try {
-    const CREDIT_COST = 2;
-const userId = "demo-user"; // or from req
+    const { prompt, imageUrl, userId = "demo-user" } = await req.json();
 
-if (!hasCredits(userId, CREDIT_COST)) {
-
-      return NextResponse.json(
-        { error: "Not enough credits" },
-        { status: 402 }
-      );
-    }
-
-    const { prompt, imageUrl } = await req.json();
     if (!prompt && !imageUrl) {
       return NextResponse.json(
         { error: "No data for PDF" },
@@ -27,12 +17,26 @@ if (!hasCredits(userId, CREDIT_COST)) {
       );
     }
 
+    // 💳 CREDIT CHECK
+    if (!hasCredits(userId, CREDIT_COST)) {
+      return NextResponse.json(
+        { error: "Not enough credits" },
+        { status: 402 }
+      );
+    }
+
+    // 🧾 PDF GENERATION
     const pdfDoc = await PDFDocument.create();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const page = pdfDoc.addPage([595, 842]);
 
     let y = 800;
-    page.drawText("ARKEES AI – Report", { x: 50, y, size: 18, font });
+    page.drawText("ARKEES AI – Report", {
+      x: 50,
+      y,
+      size: 18,
+      font,
+    });
 
     y -= 40;
     if (prompt) {
@@ -48,8 +52,8 @@ if (!hasCredits(userId, CREDIT_COST)) {
 
     const pdfBytes = await pdfDoc.save();
 
-    // ✅ SUCCESS ONLY
-    deductCredits(CREDIT_COST);
+    // ✅ DEDUCT CREDITS (SUCCESS ONLY)
+    deductCredits(userId, CREDIT_COST);
 
     return new Response(pdfBytes, {
       headers: {
