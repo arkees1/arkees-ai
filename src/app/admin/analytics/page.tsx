@@ -123,12 +123,11 @@ export default function AdminAnalyticsPage() {
   data={data.charts.dailyCreditsUsage.data}
 />
 
-      <PieChart
-        ref={pieRef}
-        title="Feature Usage Split"
-        labels={data.charts.featureUsageSplit.labels}
-        data={data.charts.featureUsageSplit.data}
-      />
+     <PieChart
+  title="Feature Usage Split"
+  labels={data.charts.featureUsageSplit.labels}
+  data={data.charts.featureUsageSplit.data}
+/>
 
       {/* ================================================= */}
       {/* ⚙️ AUTOMATION INSIGHTS — REAL DATA (4.1.2) */}
