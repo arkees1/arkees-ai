@@ -1,17 +1,25 @@
-import { getCredits, setCredits, resetCreditsFromDefault } from "@/lib/credit-store";
+// src/lib/credits-engine.ts
 
-export const DEFAULT_DEMO_CREDITS = 10;
+let DEMO_CREDITS = 10;
 
-// 🔹 deduct credits (single source = runtime)
-export function consumeCredits(userId: string, amount: number) {
-  const current = getCredits(userId);
-  if (current < amount) {
-    throw new Error("Insufficient credits");
-  }
-  setCredits(userId, current - amount);
+export function getCredits(userId?: string) {
+  return DEMO_CREDITS;
 }
 
-// 🔹 reset = ALWAYS from credits.json
-export function resetCredits(userId: string) {
-  return resetCreditsFromDefault(userId);
+export function checkCredits(userId?: string, cost = 1) {
+  return DEMO_CREDITS >= cost;
+}
+
+export function deductCredits(userId?: string, cost = 1) {
+  DEMO_CREDITS = Math.max(0, DEMO_CREDITS - cost);
+  return DEMO_CREDITS;
+}
+
+export function grantCredits(userId?: string, amount = 10) {
+  DEMO_CREDITS += amount;
+  return DEMO_CREDITS;
+}
+
+export function getDemoCredits() {
+  return DEMO_CREDITS;
 }

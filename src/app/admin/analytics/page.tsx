@@ -117,12 +117,11 @@ export default function AdminAnalyticsPage() {
   data={data.charts.dailyCreditsUsage.data}
 />
 
-      <LineChart
-        ref={lineRef}
-        title="Credits Usage Trend"
-        labels={data.charts.dailyCreditsUsage.labels}
-        data={data.charts.dailyCreditsUsage.data}
-      />
+<LineChart
+  title="Credits Usage Trend"
+  labels={data.charts.dailyCreditsUsage.labels}
+  data={data.charts.dailyCreditsUsage.data}
+/>
 
       <PieChart
         ref={pieRef}
