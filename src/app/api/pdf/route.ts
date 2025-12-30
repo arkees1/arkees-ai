@@ -8,7 +8,11 @@ const CREDIT_COST = 1;
 
 export async function POST(req: Request) {
   try {
-    if (!hasCredits(CREDIT_COST)) {
+    const CREDIT_COST = 2;
+const userId = "demo-user"; // or from req
+
+if (!hasCredits(userId, CREDIT_COST)) {
+
       return NextResponse.json(
         { error: "Not enough credits" },
         { status: 402 }
