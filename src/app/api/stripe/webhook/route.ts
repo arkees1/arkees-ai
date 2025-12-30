@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
     }
 
-    await grantCredits(userId, credits, "stripe")
+    await grantCredits(userId, credits);
 
     return NextResponse.json({ received: true })
   } catch (err: any) {
