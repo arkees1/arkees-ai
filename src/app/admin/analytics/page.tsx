@@ -111,12 +111,11 @@ export default function AdminAnalyticsPage() {
       <KPIGrid kpis={data.kpis} />
 
       {/* CHARTS */}
-      <BarChart
-        ref={barRef}
-        title="Daily Credits Usage"
-        labels={data.charts.dailyCreditsUsage.labels}
-        data={data.charts.dailyCreditsUsage.data}
-      />
+<BarChart
+  title="Daily Credits Usage"
+  labels={data.charts.dailyCreditsUsage.labels}
+  data={data.charts.dailyCreditsUsage.data}
+/>
 
       <LineChart
         ref={lineRef}
