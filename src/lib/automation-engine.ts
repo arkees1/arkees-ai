@@ -1,34 +1,30 @@
-import { checkCredits, consumeCredits } from "@/lib/credits-engine";
+import { deductCredits } from "@/lib/credits-engine";
 
 const COST: Record<string, number> = {
   dashboard_pack: 1,
-  report_pack: 2,
-  enterprise_pack: 3,
+  automation_pack: 2,
+  workflow_run: 1,
 };
 
-export async function runAutomation(
-  userId: string,
-  presetKey: string,
-  prompt: string
-) {
-  if (!userId) throw new Error("User ID missing");
-  if (!presetKey) throw new Error("Preset missing");
+type AutomationInput = {
+  userId: string;
+  type: keyof typeof COST;
+};
 
-  const cost = COST[presetKey];
-  if (!cost) throw new Error("Unknown preset");
+export function runAutomation({ userId, type }: AutomationInput) {
+  const cost = COST[type] ?? 1;
 
-  const allowed = await checkCredits(userId, cost);
-  if (!allowed) {
-    throw new Error("Insufficient credits");
+  // 💳 ATOMIC CREDIT CHECK + DEDUCT
+  const ok = deductCredits(userId, cost);
+  if (!ok) {
+    throw new Error("Not enough credits");
   }
 
-  await consumeCredits(userId, cost);
-
-  // 🚀 mock execution (real engines already exist)
+  // 🚀 Automation execution (mock / placeholder)
   return {
-    title: "Automation Result",
-    preset: presetKey,
-    prompt,
-    status: "success",
+    success: true,
+    type,
+    cost,
+    message: "Automation executed successfully",
   };
 }
