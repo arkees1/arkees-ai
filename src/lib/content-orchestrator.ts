@@ -1,29 +1,20 @@
-import { generateDashboard } from "./dashboardEngine";
+import { generateDashboardData } from "./dashboardEngine";
 
 /**
  * ONE brain.
- * Unlimited workflows.
+ * This orchestrates all content generation flows.
  */
-export async function runAutomation(
-  userId: string,
-  workflowType: string,
-  prompt: string
-) {
-  switch (workflowType) {
+export async function runContentOrchestrator(params: {
+  type: "dashboard";
+  prompt: string;
+}) {
+  const { type, prompt } = params;
+
+  switch (type) {
     case "dashboard":
-      return generateDashboard(prompt);
+      return generateDashboardData(prompt);
 
     default:
-      throw new Error(`UNSUPPORTED_WORKFLOW: ${workflowType}`);
+      throw new Error("Unsupported content type");
   }
-}
-
-/**
- * Legacy support (some APIs still call this)
- */
-export async function orchestrateContent(
-  type: "dashboard",
-  prompt: string
-) {
-  return generateDashboard(prompt);
 }
