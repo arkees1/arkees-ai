@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       )
     }
 
-    const currentCredits = await getDemoCredits(userId)
+    const currentCredits = await getDemoCredits()
 
     if (currentCredits < 1) {
       return NextResponse.json(
