@@ -1,0 +1,37 @@
+// lib/credit-store.ts
+
+type CreditState = {
+  credits: number;
+  locked: boolean;
+};
+
+const store: Record<string, CreditState> = {};
+
+export function initUser(userId: string, initialCredits = 10) {
+  if (!store[userId]) {
+    store[userId] = { credits: initialCredits, locked: false };
+  }
+}
+
+export function getCredits(userId: string): number {
+  initUser(userId);
+  return store[userId].credits;
+}
+
+export function lockUser(userId: string): boolean {
+  initUser(userId);
+  if (store[userId].locked) return false;
+  store[userId].locked = true;
+  return true;
+}
+
+export function unlockUser(userId: string) {
+  initUser(userId);
+  store[userId].locked = false;
+}
+
+export function commitCreditDeduction(userId: string, amount: number) {
+  initUser(userId);
+  store[userId].credits -= amount;
+  if (store[userId].credits < 0) store[userId].credits = 0;
+}

@@ -1,26 +1,9 @@
 import { NextResponse } from "next/server";
+import { getCredits } from "@/lib/credit-store";
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const currentCredits = Number(body.credits ?? 0);
+export const runtime = "nodejs";
 
-    if (currentCredits <= 0) {
-      return NextResponse.json(
-        { error: "No credits left" },
-        { status: 400 }
-      );
-    }
-
-    const updatedCredits = currentCredits - 1;
-
-    return NextResponse.json({
-      credits: updatedCredits,
-    });
-  } catch (e) {
-    return NextResponse.json(
-      { error: "Credits update failed" },
-      { status: 500 }
-    );
-  }
+export async function GET() {
+  const credits = getCredits("demo-user");
+  return NextResponse.json({ credits });
 }

@@ -1,0 +1,143 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import KPIGrid from "@/components/analytics/KPIGrid";
+import BarChart from "@/components/analytics/BarChart";
+import LineChart from "@/components/analytics/LineChart";
+import PieChart from "@/components/analytics/PieChart";
+
+type Insight = {
+  type: "info" | "warning" | "error";
+  message: string;
+};
+
+export default function AdminAnalyticsPage() {
+  const [data, setData] = useState<any>(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  const loadAnalytics = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (startDate) params.append("startDate", startDate);
+      if (endDate) params.append("endDate", endDate);
+
+      const res = await fetch(`/api/admin/analytics?${params.toString()}`);
+      const json = await res.json();
+      setData(json);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportPDF = () => {
+    setExporting(true);
+
+    const params = new URLSearchParams();
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
+
+    window.open(
+      `/api/admin/analytics/export-pdf?${params.toString()}`,
+      "_blank"
+    );
+
+    setTimeout(() => setExporting(false), 1500);
+  };
+
+  useEffect(() => {
+    loadAnalytics();
+  }, []);
+
+  if (!data) {
+    return <div className="p-6">Loading analytics…</div>;
+  }
+
+  const daily = data.charts?.dailyCreditsUsage;
+  const featureSplit = data.charts?.featureUsageSplit;
+
+  return (
+    <div className="p-6 space-y-8">
+      {/* FILTER BAR */}
+      <div className="flex gap-3 items-end">
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+
+        <button onClick={loadAnalytics} disabled={loading}>
+          {loading ? "Applying…" : "Apply"}
+        </button>
+
+        <button onClick={exportPDF} disabled={exporting}>
+          {exporting ? "Exporting PDF…" : "Export PDF"}
+        </button>
+      </div>
+
+      {/* KPI GRID */}
+      <KPIGrid kpis={data.kpis} />
+
+      {/* ADMIN INSIGHTS */}
+      <div className="border rounded p-4 bg-gray-50">
+        <h2 className="text-lg font-semibold mb-3">🔍 Admin Insights</h2>
+
+        {data.insights?.length ? (
+          <ul className="space-y-2">
+            {data.insights.map((insight: Insight, idx: number) => (
+              <li
+                key={idx}
+                className={`p-2 rounded text-sm ${
+                  insight.type === "warning"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : insight.type === "error"
+                    ? "bg-red-100 text-red-800"
+                    : "bg-blue-100 text-blue-800"
+                }`}
+              >
+                {insight.message}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-sm text-gray-500">
+            No insights available.
+          </div>
+        )}
+      </div>
+
+      {/* CHARTS (SAFE RENDERING) */}
+      {daily?.labels && daily?.data && (
+        <>
+          <BarChart
+            title="Daily Credits Usage"
+            labels={daily.labels}
+            data={daily.data}
+          />
+
+          <LineChart
+            title="Credits Usage Trend"
+            labels={daily.labels}
+            data={daily.data}
+          />
+        </>
+      )}
+
+      {featureSplit?.labels && featureSplit?.data && (
+        <PieChart
+          title="Feature Usage Split"
+          labels={featureSplit.labels}
+          data={featureSplit.data}
+        />
+      )}
+    </div>
+  );
+}

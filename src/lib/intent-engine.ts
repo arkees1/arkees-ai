@@ -1,34 +1,37 @@
-import fs from "fs";
-import path from "path";
+/**
+ * Supported intent types across the system
+ */
+export type IntentType =
+  | "chat"
+  | "pdf"
+  | "csv"
+  | "image"
+  | "dashboard"
+  | "automation";
 
-type CreditRecord = {
-  userId: string;
-  credits: number;
-};
+/**
+ * Intent resolver
+ */
+export function resolveIntent(prompt: string): IntentType {
+  const p = prompt.toLowerCase();
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const CREDIT_FILE = path.join(DATA_DIR, "credits.json");
+  if (p.includes("dashboard")) return "dashboard";
+  if (p.includes("csv")) return "csv";
+  if (p.includes("pdf")) return "pdf";
+  if (p.includes("image")) return "image";
 
-function ensureStore() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR);
-  }
-  if (!fs.existsSync(CREDIT_FILE)) {
-    fs.writeFileSync(CREDIT_FILE, JSON.stringify({}), "utf-8");
-  }
+  return "chat";
 }
 
-export function getUserCredits(userId: string): number {
-  ensureStore();
-  const raw = fs.readFileSync(CREDIT_FILE, "utf-8");
-  const data = JSON.parse(raw || "{}");
-  return data[userId] ?? 0;
-}
+/**
+ * 🔥 PUBLIC ENGINE (this was missing)
+ * Used by /api/chat
+ */
+export async function runIntentEngine(prompt: string) {
+  const intent = resolveIntent(prompt);
 
-export function setUserCredits(userId: string, credits: number) {
-  ensureStore();
-  const raw = fs.readFileSync(CREDIT_FILE, "utf-8");
-  const data = JSON.parse(raw || "{}");
-  data[userId] = credits;
-  fs.writeFileSync(CREDIT_FILE, JSON.stringify(data, null, 2), "utf-8");
+  return {
+    intent,
+    prompt,
+  };
 }

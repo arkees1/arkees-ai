@@ -1,0 +1,33 @@
+// /app/api/credits/route.ts
+// Credits read endpoint
+// Phase-3: Session-based user resolution (SAFE)
+
+import { NextResponse } from "next/server";
+import { getCredits } from "@/lib/userCredits";
+import { getSessionUser } from "@/lib/auth/session";
+
+export async function GET(req: Request) {
+  try {
+    // 🔐 Resolve user from session (soft auth)
+    const session = getSessionUser(req);
+    const userId = session.userId;
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "UNAUTHENTICATED" },
+        { status: 401 }
+      );
+    }
+
+    const credits = await getCredits(userId);
+
+    return NextResponse.json({
+      credits,
+    });
+  } catch {
+    return NextResponse.json(
+      { error: "CREDITS_FETCH_FAILED" },
+      { status: 500 }
+    );
+  }
+}

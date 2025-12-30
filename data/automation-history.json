@@ -1,0 +1,37 @@
+[
+  {
+    "id": "facba46c-48fa-4420-8639-6a2459c4d588",
+    "createdAt": "2025-12-27T09:37:23.250Z",
+    "userId": "demo-user",
+    "presetKey": "dashboard_pack",
+    "creditsUsed": 1
+  },
+  {
+    "id": "e38f08ee-3f13-44d5-8d2e-034184da02f5",
+    "createdAt": "2025-12-27T09:37:20.277Z",
+    "userId": "demo-user",
+    "presetKey": "enterprise_pack",
+    "creditsUsed": 3
+  },
+  {
+    "id": "bddf8e4f-1f0b-4c3f-aa54-bb6d5276b42e",
+    "createdAt": "2025-12-27T09:37:17.356Z",
+    "userId": "demo-user",
+    "presetKey": "report_pack",
+    "creditsUsed": 2
+  },
+  {
+    "id": "0f73e2bf-a12f-4ac2-9cfa-b39fac7ebc7c",
+    "createdAt": "2025-12-27T09:37:12.341Z",
+    "userId": "demo-user",
+    "presetKey": "enterprise_pack",
+    "creditsUsed": 3
+  },
+  {
+    "id": "f672b16d-b97d-4af4-bb97-f7bd4cd180ca",
+    "createdAt": "2025-12-27T09:37:06.374Z",
+    "userId": "demo-user",
+    "presetKey": "dashboard_pack",
+    "creditsUsed": 1
+  }
+]

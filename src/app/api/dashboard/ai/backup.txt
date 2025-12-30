@@ -1,0 +1,38 @@
+import { NextResponse } from "next/server";
+import { generateDashboardData } from "@/lib/dashboard-ai-engine";
+import { deductCredits, getCredits } from "@/lib/credits-engine";
+
+export async function POST(req: Request) {
+  try {
+    const { prompt, userId } = await req.json();
+
+    if (!prompt || !userId) {
+      return NextResponse.json(
+        { error: "Prompt & userId required" },
+        { status: 400 }
+      );
+    }
+
+    // 🔥 ALWAYS deduct first
+    const creditsLeft = await deductCredits(userId, 1);
+
+    const dashboard = await generateDashboardData(prompt);
+
+    return NextResponse.json({
+      dashboard: {
+        title: dashboard.title ?? "Dashboard",
+        subtitle: dashboard.subtitle ?? prompt,
+        kpis: dashboard.kpis ?? [],
+        insights: dashboard.insights ?? [],
+      },
+      creditsLeft, // 🚨 MUST ALWAYS SEND THIS
+    });
+  } catch (err) {
+    console.error("DASHBOARD ERROR:", err);
+
+    return NextResponse.json(
+      { error: "Dashboard generation failed" },
+      { status: 500 }
+    );
+  }
+}

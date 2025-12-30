@@ -1,0 +1,157 @@
+import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+
+const HISTORY_FILE = path.join(
+  process.cwd(),
+  "data",
+  "automation-history.json"
+);
+
+export async function POST(req: Request) {
+  const { userId, runIds } = await req.json();
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "userId missing" },
+      { status: 400 }
+    );
+  }
+
+  if (!fs.existsSync(HISTORY_FILE)) {
+    return NextResponse.json(
+      { error: "No history found" },
+      { status: 404 }
+    );
+  }
+
+  const allRuns = JSON.parse(
+    fs.readFileSync(HISTORY_FILE, "utf-8")
+  );
+
+  let runs = allRuns.filter((r: any) => r.userId === userId);
+
+  if (Array.isArray(runIds) && runIds.length > 0) {
+    const set = new Set(runIds);
+    runs = runs.filter((r: any) => set.has(r.id));
+  }
+
+  const pdfDoc = await PDFDocument.create();
+
+  const fontRegular = await pdfDoc.embedFont(
+    StandardFonts.Helvetica
+  );
+  const fontBold = await pdfDoc.embedFont(
+    StandardFonts.HelveticaBold
+  );
+
+  let page = pdfDoc.addPage([595, 842]); // A4
+  let y = 800;
+
+  // ---------- HEADER ----------
+  page.drawText("ARKEES AI", {
+    x: 40,
+    y,
+    size: 22,
+    font: fontBold,
+    color: rgb(0.12, 0.35, 0.85), // brand blue
+  });
+
+  y -= 24;
+
+  page.drawText("Automation Usage History", {
+    x: 40,
+    y,
+    size: 13,
+    font: fontRegular,
+  });
+
+  y -= 16;
+
+  page.drawText(
+    `User: ${userId}  •  Generated: ${new Date().toLocaleString()}`,
+    {
+      x: 40,
+      y,
+      size: 9,
+      font: fontRegular,
+      color: rgb(0.4, 0.4, 0.4),
+    }
+  );
+
+  y -= 20;
+
+  // divider
+  page.drawLine({
+    start: { x: 40, y },
+    end: { x: 555, y },
+    thickness: 1,
+    color: rgb(0.85, 0.85, 0.85),
+  });
+
+  y -= 24;
+
+  // ---------- BODY ----------
+  for (const r of runs) {
+    if (y < 80) {
+      page = pdfDoc.addPage([595, 842]);
+      y = 800;
+    }
+
+    page.drawText(
+      `${r.presetKey.replace("_", " ").toUpperCase()}`,
+      {
+        x: 40,
+        y,
+        size: 11,
+        font: fontBold,
+      }
+    );
+
+    y -= 14;
+
+    page.drawText(
+      `Credits Used: ${r.creditsUsed}   |   ${new Date(
+        r.createdAt
+      ).toLocaleString()}`,
+      {
+        x: 40,
+        y,
+        size: 10,
+        font: fontRegular,
+        color: rgb(0.2, 0.2, 0.2),
+      }
+    );
+
+    y -= 18;
+
+    page.drawLine({
+      start: { x: 40, y },
+      end: { x: 555, y },
+      thickness: 0.5,
+      color: rgb(0.9, 0.9, 0.9),
+    });
+
+    y -= 16;
+  }
+
+  // ---------- FOOTER ----------
+  page.drawText("ARKEES AI • Think Less. Create More.", {
+    x: 40,
+    y: 30,
+    size: 9,
+    font: fontRegular,
+    color: rgb(0.5, 0.5, 0.5),
+  });
+
+  const pdfBytes = await pdfDoc.save();
+
+  return new Response(pdfBytes, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition":
+        'attachment; filename="automation-history.pdf"',
+    },
+  });
+}

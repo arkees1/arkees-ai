@@ -1,0 +1,56 @@
+import { NextResponse } from "next/server";
+
+export const runtime = "nodejs";
+
+/**
+ * ARKEES AI — Video (Early Access)
+ * SAFE SOFT MODE (FINAL)
+ *
+ * - No credits deducted
+ * - Honest queueing
+ * - No fake processing
+ * - Future-ready for real video (V2)
+ */
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { prompt, userId } = body;
+
+    if (!prompt || !userId) {
+      return NextResponse.json(
+        { error: "prompt and userId required" },
+        { status: 400 }
+      );
+    }
+
+    const videoJob = {
+      id: `vid_${Date.now()}`,
+      userId,
+      prompt,
+      status: "queued", // queued | processing | delivered (V2)
+      engine: "early-access",
+      creditsDeducted: 0,
+      createdAt: new Date().toISOString(),
+      note:
+        "Early access: request queued. No credits charged. You will be notified when video generation is available.",
+    };
+
+    // Phase V2 TODO:
+    // - Persist job (DB)
+    // - Background worker
+    // - Notification on delivery
+
+    return NextResponse.json({
+      status: "ok",
+      message: "Your video request has been queued.",
+      creditsDeducted: 0,
+      earlyAccess: true,
+      job: videoJob,
+    });
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: "Video request failed", detail: err?.message },
+      { status: 500 }
+    );
+  }
+}

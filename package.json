@@ -3,23 +3,35 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "set NEXT_DISABLE_TURBOPACK=1 && next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
     "@parcel/css-win32-x64-msvc": "^1.13.1",
     "autoprefixer": "^10.4.22",
+    "canvas": "^3.2.0",
+    "chart.js": "^4.5.1",
+    "chartjs-node-canvas": "^5.0.0",
+    "dom-to-image-more": "^3.7.2",
+    "exceljs": "^4.4.0",
+    "html-to-image": "^1.11.13",
     "jspdf": "^3.0.4",
     "lightningcss": "^1.30.2",
-    "next": "^16.0.10",
+    "lucide-react": "^0.562.0",
+    "next": "^14.2.5",
+    "next-auth": "^4.24.13",
     "openai": "^6.10.0",
     "pdf-lib": "^1.17.1",
+    "pdfkit": "^0.17.2",
     "postcss": "^8.5.6",
+    "pptxgenjs": "^4.0.1",
     "react": "18.2.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "18.2.0",
     "stripe": "^20.0.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",

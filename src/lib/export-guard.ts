@@ -1,17 +1,26 @@
-import { IntentType } from "./intent-engine";
+/**
+ * Export Guard
+ * Controls which exports are allowed per intent
+ */
 
-export function canExport(
-  intent: IntentType,
-  exportType: "pdf" | "csv"
-): boolean {
-  // Chat cannot be exported directly
-  if (intent === "chat") return false;
+export type IntentType =
+  | "dashboard"
+  | "csv"
+  | "excel"
+  | "pdf"
+  | "image"
+  | "video"
+  | "automation";
 
-  // Report → PDF allowed
-  if (intent === "report" && exportType === "pdf") return true;
+export function canExport(intent: IntentType) {
+  switch (intent) {
+    case "dashboard":
+    case "csv":
+    case "excel":
+    case "pdf":
+      return true;
 
-  // CSV only from csv intent
-  if (intent === "csv" && exportType === "csv") return true;
-
-  return false;
+    default:
+      return false;
+  }
 }

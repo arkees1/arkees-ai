@@ -1,0 +1,125 @@
+import { NextResponse } from "next/server";
+import JSZip from "jszip";
+
+/* ---------------- BUILD CONTEXT ---------------- */
+function buildVideoContext(messages: any[]) {
+  return {
+    product: "ARKEES AI",
+    audience: "Founders, Operations Heads, Teams",
+    outcome: "Automated decisions and reports",
+  };
+}
+
+/* ---------------- MAIN ROUTE ---------------- */
+export async function POST(req: Request) {
+  try {
+    const { messages } = await req.json();
+
+    if (!Array.isArray(messages)) {
+      return NextResponse.json(
+        { error: "Invalid messages" },
+        { status: 400 }
+      );
+    }
+
+    const context = buildVideoContext(messages);
+    const zip = new JSZip();
+
+    /* -------- VIDEO SCRIPT -------- */
+    zip.file(
+      "video-script.txt",
+      `
+[Scene 1 – Problem]
+Manual processes slow your business.
+
+[Scene 2 – Trigger]
+A simple message enters ARKEES AI.
+
+[Scene 3 – AI Processing]
+AI understands intent, data, and urgency.
+
+[Scene 4 – Automation]
+Actions are triggered automatically.
+
+[Scene 5 – Dashboard]
+Real-time dashboards are generated.
+
+[Scene 6 – Impact]
+Faster decisions. Less manual work.
+
+[Scene 7 – CTA]
+Think Less. Create More. With ARKEES AI.
+      `.trim()
+    );
+
+    /* -------- VOICEOVER -------- */
+    zip.file(
+      "voiceover-script.txt",
+      `
+"Every business struggles with manual work.
+ARKEES AI changes that.
+From a single message,
+to full automation,
+dashboards,
+and decisions —
+all in minutes.
+Think less.
+Create more."
+      `.trim()
+    );
+
+    /* -------- STORYBOARD -------- */
+    zip.file(
+      "storyboard.json",
+      JSON.stringify(
+        [
+          { scene: 1, visual: "Busy team, chaos", text: "Manual work slows you down" },
+          { scene: 2, visual: "Message enters system", text: "Trigger received" },
+          { scene: 3, visual: "AI brain animation", text: "AI understands intent" },
+          { scene: 4, visual: "Flow arrows", text: "Automation executes" },
+          { scene: 5, visual: "Dashboard screen", text: "Insights generated" },
+          { scene: 6, visual: "Happy team", text: "Business impact" },
+          { scene: 7, visual: "Brand screen", text: "ARKEES AI" },
+        ],
+        null,
+        2
+      )
+    );
+
+    /* -------- SCENE GUIDE -------- */
+    zip.file(
+      "scene-by-scene.md",
+      `
+Scene 1: Show pain point
+Scene 2: Introduce trigger
+Scene 3: AI processing animation
+Scene 4: Automation flow
+Scene 5: Dashboard visuals
+Scene 6: Results and benefits
+Scene 7: Call to action
+      `.trim()
+    );
+
+    /* -------- CONTEXT -------- */
+    zip.file(
+      "automation-context.json",
+      JSON.stringify(context, null, 2)
+    );
+
+    const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+
+    return new NextResponse(zipBuffer, {
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition":
+          "attachment; filename=arkees-video-automation-pack.zip",
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch {
+    return NextResponse.json(
+      { error: "Video automation pack failed" },
+      { status: 500 }
+    );
+  }
+}

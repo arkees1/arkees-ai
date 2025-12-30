@@ -1,63 +1,38 @@
-import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { STRIPE_PLANS } from "@/lib/stripe-plans";
-
-export const runtime = "nodejs";
+import { NextResponse } from "next/server"
+import { STRIPE_PLANS, StripePlanKey } from "@/lib/stripe-plans"
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { plan, userId } = body;
+    const body = await req.json()
+    const { plan } = body
 
-    // 🔒 Basic validation
-    if (!plan || !userId) {
+    if (!plan || typeof plan !== "string") {
       return NextResponse.json(
-        { error: "Missing plan or userId" },
+        { success: false, error: "Plan is required" },
         { status: 400 }
-      );
+      )
     }
 
-    const selectedPlan = STRIPE_PLANS[plan];
-
-    if (!selectedPlan) {
+    if (!(plan in STRIPE_PLANS)) {
       return NextResponse.json(
-        { error: "Unknown plan selected" },
+        { success: false, error: "Invalid plan" },
         { status: 400 }
-      );
+      )
     }
 
-    // 🆓 FREE PLAN — no Stripe checkout
-    if (!selectedPlan.priceId) {
-      return NextResponse.json(
-        { error: "This plan is free. No checkout required." },
-        { status: 400 }
-      );
-    }
+    const planKey = plan as StripePlanKey
+    const selectedPlan = STRIPE_PLANS[planKey]
 
-    // 💳 Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      line_items: [
-        {
-          price: selectedPlan.priceId,
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=1`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
-      metadata: {
-        userId, // webhook reads this
-        plan,   // webhook maps to credits
-      },
-    });
-
-    return NextResponse.json({ url: session.url });
-  } catch (err) {
-    console.error("Stripe checkout error:", err);
-
+    return NextResponse.json({
+      success: true,
+      plan: selectedPlan.name,
+      credits: selectedPlan.credits,
+      priceId: selectedPlan.priceId,
+    })
+  } catch (err: any) {
     return NextResponse.json(
-      { error: "Unable to start checkout session" },
+      { success: false, error: err.message },
       { status: 500 }
-    );
+    )
   }
 }

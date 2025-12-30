@@ -1,0 +1,113 @@
+"use client";
+
+import { useState } from "react";
+
+export default function DashboardPage() {
+  const [prompt, setPrompt] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const generateImage = async () => {
+    if (!prompt.trim()) {
+      setMessage("Please enter a prompt first.");
+      return;
+    }
+
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/image/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Image generation failed");
+      }
+
+      setImageUrl(data.imageUrl);
+    } catch (err: any) {
+      setMessage(err.message || "Image generation failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadPDF = async () => {
+    if (!imageUrl && !prompt.trim()) {
+      setMessage("Please generate image or content first.");
+      return;
+    }
+
+    setMessage(null);
+
+    const res = await fetch("/api/pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt,
+        imageUrl,
+      }),
+    });
+
+    if (!res.ok) {
+      setMessage("Failed to generate PDF");
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "arkees-ai-report.pdf";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div style={{ padding: 24 }}>
+      <h1>ARKEES AI Dashboard</h1>
+
+      <textarea
+        placeholder="Describe what you want to generate..."
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        rows={4}
+        style={{ width: "100%", marginBottom: 12 }}
+      />
+
+      <div style={{ display: "flex", gap: 12 }}>
+        <button onClick={generateImage} disabled={loading}>
+          {loading ? "Generating..." : "Generate Image"}
+        </button>
+
+        <button onClick={downloadPDF}>
+          Download Analytics PDF
+        </button>
+
+        <button
+          onClick={() =>
+            setMessage("Video generation is Early Access. Coming soon.")
+          }
+        >
+          Generate Video (Early Access)
+        </button>
+      </div>
+
+      {message && (
+        <p style={{ marginTop: 12, color: "crimson" }}>{message}</p>
+      )}
+
+      {imageUrl && (
+        <div style={{ marginTop: 20 }}>
+          <img src={imageUrl} alt="Generated" style={{ maxWidth: "100%" }} />
+        </div>
+      )}
+    </div>
+  );
+}
