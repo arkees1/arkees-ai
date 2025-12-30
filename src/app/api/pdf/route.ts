@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PDFDocument, StandardFonts } from "pdf-lib";
-import { hasCredits, deductCredits } from "@/lib/credits-engine";
+import { deductCredits } from "@/lib/credits-engine";
 
 export const runtime = "nodejs";
 
@@ -17,8 +17,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // 💳 CREDIT CHECK
-    if (!hasCredits(userId, CREDIT_COST)) {
+    // 💳 ATOMIC CREDIT CHECK + DEDUCT
+    const ok = deductCredits(userId, CREDIT_COST);
+    if (!ok) {
       return NextResponse.json(
         { error: "Not enough credits" },
         { status: 402 }
@@ -51,9 +52,6 @@ export async function POST(req: Request) {
     }
 
     const pdfBytes = await pdfDoc.save();
-
-    // ✅ DEDUCT CREDITS (SUCCESS ONLY)
-    deductCredits(userId, CREDIT_COST);
 
     return new Response(pdfBytes, {
       headers: {
