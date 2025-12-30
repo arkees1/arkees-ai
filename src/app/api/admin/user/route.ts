@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       )
     }
 
-    await deductCredits(userId, 1)
+    await deductCredits(userId, 1);
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

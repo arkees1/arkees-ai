@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     }
 
     // 🔐 Deduct credits for workflow run
-    deductCredits(userId, 1, "workflow.run");
+    deductCredits(userId, 1);
 
     return NextResponse.json({
       success: true,

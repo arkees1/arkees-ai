@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     }
 
     // 💳 Chat costs 1 credit
-    const ok = deductCredits(userId, 1, "chat.message");
+    const ok = deductCredits(userId, 1);
 
     if (!ok) {
       return NextResponse.json(

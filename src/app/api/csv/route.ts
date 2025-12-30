@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     }
 
     // 🔻 Deduct 1 credit (demo)
-    await deductCredits(userId, 1, "csv.export")
+    await deductCredits(userId, 1);
 
     // 🧾 Build CSV from text (row-wise)
     const rows = content

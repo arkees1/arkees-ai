@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     }
 
     // 🔐 Deduct credits for excel export
-    deductCredits(userId, 1, "excel.export");
+    deductCredits(userId, 1);
 
     return NextResponse.json({
       success: true,

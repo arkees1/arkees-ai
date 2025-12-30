@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     }
 
     // 💳 PDF generation costs 2 credits
-    const ok = deductCredits(userId, 2, "dashboard.pdf");
+    const ok = deductCredits(userId, 2);
 
     if (!ok) {
       return NextResponse.json(

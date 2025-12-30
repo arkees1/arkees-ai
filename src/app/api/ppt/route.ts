@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   try {
     const { userId = "demo-user" } = await req.json();
 
-    deductCredits(userId, 1, "ppt.generate");
+    deductCredits(userId, 1);
 
     return NextResponse.json({
       success: true,
