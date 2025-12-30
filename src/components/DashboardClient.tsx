@@ -58,7 +58,7 @@ export default function DashboardClient() {
   return (
     <div style={{ padding: 20 }}>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <CreditsBadge credits={{ remaining: 50 }} />
+        <CreditsBadge credits={50} />
       </div>
 
       <div
