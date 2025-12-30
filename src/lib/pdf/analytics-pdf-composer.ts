@@ -1,44 +1,41 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts } from "pdf-lib";
 
-export async function generateAnalyticsPDF(title: string) {
+export async function generateAnalyticsPDF() {
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
   const page = pdfDoc.addPage([595, 842]);
   let y = 800;
 
-  page.drawText(title || "Analytics Report", {
+  page.drawText("ARKEES AI – Analytics Report", {
     x: 50,
     y,
     size: 18,
     font,
-    color: rgb(0, 0, 0),
   });
 
   y -= 40;
 
-  // sample data — safe placeholder
-  const data = [
-    { label: "2016", value: 220 },
-    { label: "2017", value: 210 },
-    { label: "2018", value: 230 },
-    { label: "2019", value: 240 },
-    { label: "2020", value: 260 },
+  const lines = [
+    "This is a summary analytics report.",
+    "",
+    "• Total Credits Used: 120",
+    "• Active Users: 15",
+    "• Most Used Feature: Dashboard",
+    "",
+    "Charts will be added in a future update.",
   ];
 
-  const chartPNG = await renderLineChartPNG(
-    "Sample AQI Trend",
-    data
-  );
+  for (const line of lines) {
+    page.drawText(line, {
+      x: 50,
+      y,
+      size: 11,
+      font,
+    });
+    y -= 18;
+  }
 
-  const pngImage = await pdfDoc.embedPng(chartPNG);
-
-  page.drawImage(pngImage, {
-    x: 50,
-    y: y - 300,
-    width: 500,
-    height: 250,
-  });
-
-  return await pdfDoc.save();
+  const pdfBytes = await pdfDoc.save();
+  return pdfBytes;
 }
