@@ -1,6 +1,6 @@
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 
-type Point = {
+export type Point = {
   label: string;
   value: number;
 };
@@ -8,33 +8,35 @@ type Point = {
 const width = 800;
 const height = 400;
 
-export function renderLineChartPNG(
-  title: string,
-  points: Point[]
-): Buffer {
-  const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
+const chartJSNodeCanvas = new ChartJSNodeCanvas({
+  width,
+  height,
+  backgroundColour: "white",
+});
 
+export async function renderLineChartPNG(
+  title: string,
+  data: Point[]
+): Promise<Buffer> {
   const configuration = {
-    type: "line" as const,
+    type: "line",
     data: {
-      labels: points.map((p) => p.label),
+      labels: data.map((d) => d.label),
       datasets: [
         {
           label: title,
-          data: points.map((p) => p.value),
-          borderColor: "#2563eb", // blue-600
+          data: data.map((d) => d.value),
+          borderColor: "rgb(37, 99, 235)",
           backgroundColor: "rgba(37, 99, 235, 0.2)",
-          tension: 0.3,
+          tension: 0.4,
         },
       ],
     },
     options: {
       responsive: false,
       plugins: {
-        legend: { display: false },
-        title: {
+        legend: {
           display: true,
-          text: title,
         },
       },
       scales: {
@@ -45,5 +47,7 @@ export function renderLineChartPNG(
     },
   };
 
-  return chartJSNodeCanvas.renderToBuffer(configuration);
+  // ✅ IMPORTANT FIX
+  const buffer = await chartJSNodeCanvas.renderToBuffer(configuration);
+  return buffer;
 }
