@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 import Image from "next/image";
 import { ReactNode } from "react";
 

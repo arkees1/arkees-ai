@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@parcel/css-win32-x64-msvc": "^1.13.1",
+    "@vercel/analytics": "^1.6.1",
     "autoprefixer": "^10.4.22",
     "canvas": "^3.2.0",
     "chart.js": "^4.5.1",
