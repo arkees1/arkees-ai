@@ -52,10 +52,12 @@ export default function RootLayout({
           </div>
         </header>
 
-        <main className="max-w-[1400px] mx-auto">
+                <main className="max-w-[1400px] mx-auto">
           {children}
         </main>
+
+        {/* Vercel Analytics */}
+        <Analytics />
       </body>
-    </html>
   );
 }
